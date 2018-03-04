@@ -1,0 +1,75 @@
+1) HACER CORTES ÓPTIMOS (DISTRIBUCION NORMAL)
+#Disctrizando la variable Day_mins
+day_mins_cuali1=cut(datos_cuanti$Day_Mins,breaks=5)
+
+barplot(table(datos_cuali$Churn,day_mins_cuali1))
+
+prop.table(table(day_mins_cuali1))
+
+2) DISCRETIZACION POR QUANTILES
+day_mins_cuali2=cut(datos_cuanti$Day_Mins,breaks=
+                      c(min(datos_cuanti$Day_Mins),
+                        quantile(datos_cuanti$Day_Mins,0.20),
+                        quantile(datos_cuanti$Day_Mins,0.40),
+                        quantile(datos_cuanti$Day_Mins,0.60),
+                        quantile(datos_cuanti$Day_Mins,0.80),
+                        max(datos_cuanti$Day_Mins)
+                      ))
+
+3) GRAFICAR VARIABLES CATEGORICAS
+barplot(table(day_mins_cuali2))
+
+4) CREANDO TABLA DE CONTINGENCIA
+table(datos$Churn,day_mins_cuali1)
+prop.table(table(datos$Churn,day_mins_cuali1))
+prop.table(table(datos$Churn,day_mins_cuali1),1)
+prop.table(table(datos$Churn,day_mins_cuali1),2)
+
+5) APLICAR CHI CUADRADO
+chisq.test(table(datos$Churn,datos$Area_Code))
+
+6) SELECCIONAR TIPOS DE VARIABLES (UNA MANERA)
+cualitativa=c('State','Area_Code','International_Plan','Vmail_Plan','Churn')
+datos_cuali=datos[,colnames(datos)%in%cualitativa]
+
+7) CALCULAR CHI CUADRADO A UNA LISTA DE VARIABLES
+chi2=rep(0,5)
+chi2
+
+pdf("Chi2.pdf")
+
+for(i in 1:5)
+{
+  chi2[i]=round(chisq.test(table(datos_cuali[,i],datos_cuali$Churn))$p.value,2)
+  barplot(prop.table(table(datos_cuali[,i],datos_cuali$Churn),2))
+}
+
+dev.off()
+
+chi2
+
+8) CALCULAR Y GRAFICAR UNA MATRIZ DE CORRELACION
+mat_cor=round(cor(datos_cuanti),2)
+mat_cor
+plot(datos_cuanti$Vmail_Message,datos_cuanti$Day_Mins)
+
+
+install.packages("reshape2")
+install.packages("ggplot2")
+library(reshape2)
+library(ggplot2)
+
+m_cormat=melt(cor(datos_cuanti))
+m_cormat
+
+ggplot(data=m_cormat, aes(x=Var1,y=Var2,fill=value))+
+  geom_tile()+scale_fill_gradient2(limits=c(-1,1))
+
+9) RELACION ENTRE UNA VARIABLE CUANTITATIVA Y CUALITATIVA
+boxplot(datos$Day_Mins~datos$Churn)
+t.test(datos$Day_Mins~datos$Churn)
+summary(aov(datos$Day_Mins~datos$Churn))  
+
+
+
+
